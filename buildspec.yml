@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - ls -la *
+      - chmod +x ./gradlew
+      - ./gradlew clean
+      #- ./gradlew assembleAndroidTest
+      - ./gradlew assembleDebug
+artifacts:
+  files:
+    - './MyApplication/app/build/outputs/**/*.apk'
+  discard-paths: yes

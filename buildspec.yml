@@ -12,6 +12,7 @@ phases:
       - ./gradlew clean
       #- ./gradlew assembleAndroidTest
       - ./gradlew assembleDebug
+      - ls -la ./app/build/outputs/apk/debug/
 artifacts:
   files:
     - './app/build/outputs/**/*.apk'

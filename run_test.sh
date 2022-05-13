@@ -39,18 +39,16 @@ for uploadArn in "${uploadArns[@]}"; do
     status=$(aws devicefarm get-upload --arn "${uploadArn}"|jq -r ."upload.status")
     echo "#loop "$i
     echo $status
-    if [ "$status"x = "SUCCEEDED"x ]; then
+    if [ "$status"x = "SUCCEEDED11"x ]; then
       echo "######status success"
       break
     fi
-    echo "not success"
-    let i++
-    echo "i++"
+
+    i=`expr $i + 1`
     if [ $i -gt 10 ]; then
       echo "###upload task time out"
       exit 255
     fi
-    echo "over"
   done
 done
 

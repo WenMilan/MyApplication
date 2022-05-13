@@ -36,7 +36,7 @@ phases:
       - testUploadUrl=`echo ${testOutput}|jq -r ."upload.url"`
       - curl -T ${pkgfile} ${pkgUploadUrl}
       - curl -T ${testfile} ${testUploadUrl}
-      - aws devicefarm schedule-run --project-arn ${prjectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn}
+      - aws devicefarm schedule-run --project-arn ${projectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn}
 
 artifacts:
   files:

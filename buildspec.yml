@@ -30,13 +30,16 @@ phases:
       - testfile=`find . -name ${testfilename}`
       - pkgOutput=$(aws devicefarm create-upload --project-arn ${projectArn} --name ${appfilename} --type ANDROID_APP)
       - pkgUploadArn=`echo ${pkgOutput}|jq -r ."upload.arn"`
+      - echo $pkgUploadArn
       - pkgUploadUrl=`echo ${pkgOutput}|jq -r ."upload.url"`
       - testOutput=$(aws devicefarm create-upload --project-arn ${projectArn} --name ${testfilename} --type INSTRUMENTATION_TEST_PACKAGE)
       - testUploadArn=`echo ${testOutput}|jq -r ."upload.arn"`
+      - echo $testUploadArn
       - testUploadUrl=`echo ${testOutput}|jq -r ."upload.url"`
       - curl -T ${pkgfile} ${pkgUploadUrl}
       - curl -T ${testfile} ${testUploadUrl}
-      - aws devicefarm schedule-run --project-arn ${projectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn}
+      - result=$(aws devicefarm schedule-run --project-arn ${projectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn})
+      - echo $result
 
 artifacts:
   files:

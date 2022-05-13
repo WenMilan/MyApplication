@@ -24,31 +24,30 @@ echo "#start to upload $testfile at $(date '+%Y-%m-%d %H:%M:%S')"
 curl -T ${testfile} ${testUploadUrl}
 echo "#finish to upload $testfile at $(date '+%Y-%m-%d %H:%M:%S')"
 
-aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"
-
-#uploadArns=(
-#	"${testUploadArn}"
-#	"${pkgUploadArn}"
-#)
-
 #check upload finished
-#for uploadArn in "${uploadArns[@]}"; do
-#  i=0
-#  status=FAILED
-#  echo "######Start $uploadArn"
-#  while true ;do
-#    sleep 1
-#    status=$(aws devicefarm get-upload --arn "${uploadArn}"|jq -r ."upload.status")
-#    echo "#loop "$i
-#    echo $status
-#    if [ "$status"x = "SUCCEEDED"x ]; then
-#      break;
-#    fi
-#    let i++
-#    if [ $i -gt 10 ]; then
-#      echo "###upload task time out"
-#      exit 255
-#    fi
-#  done
-#done
+uploadArns=(
+	"${testUploadArn}"
+	"${pkgUploadArn}"
+)
 
+for uploadArn in "${uploadArns[@]}"; do
+  i=0
+  status=FAILED
+  echo "######Start $uploadArn"
+  while true ;do
+    sleep 1
+    status=$(aws devicefarm get-upload --arn "${uploadArn}"|jq -r ."upload.status")
+    echo "#loop "$i
+    echo $status
+    if [ "$status"x = "SUCCEEDED"x ]; then
+      break;
+    fi
+    let i++
+    if [ $i -gt 10 ]; then
+      echo "###upload task time out"
+      exit 255
+    fi
+  done
+done
+
+aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"

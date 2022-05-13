@@ -4,7 +4,8 @@ phases:
   install:
     runtime-versions:
       java: corretto11
-      python: 3.8
+      #python: 3.8
+      aws-cli: 2.0
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."

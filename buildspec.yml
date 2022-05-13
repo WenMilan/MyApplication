@@ -15,6 +15,7 @@ phases:
       - testfilename="app-debug-androidTest.apk"
       - devicePoolArn="arn:aws:devicefarm:us-west-2:272510231547:devicepool:34b18a67-8bad-4c40-b42e-aa96bba3cca7/b00b0350-a024-477c-9c82-0f6d6242a977"
       - projectArn='arn:aws:devicefarm:us-west-2:272510231547:project:34b18a67-8bad-4c40-b42e-aa96bba3cca7'
+      - runname="MyAndroidTest$(date '+%Y-%m-%d %H:%M:%S')"
 
   build:
     commands:
@@ -43,7 +44,7 @@ phases:
       - sleep 120
       - aws devicefarm get-upload --arn "${pkgUploadArn}"
       - aws devicefarm get-upload --arn "${testUploadArn}"
-      - aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"
+      - aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"
 
 artifacts:
   files:

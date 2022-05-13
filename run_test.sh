@@ -39,7 +39,7 @@ for uploadArn in "${uploadArns[@]}"; do
     status=$(aws devicefarm get-upload --arn "${uploadArn}"|jq -r ."upload.status")
     echo "#loop "$i
     echo $status
-    if [ "$status"x = "SUCCEEDED11"x ]; then
+    if [ "$status"x = "SUCCEEDED"x ]; then
       echo "######status success"
       break
     fi

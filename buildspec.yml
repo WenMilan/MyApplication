@@ -4,15 +4,39 @@ phases:
   install:
     runtime-versions:
       java: corretto11
+      python: 3.8
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - apt-get install -y jq
+      - projectArn="arn:aws:devicefarm:us-west-2:272510231547:project:34b18a67-8bad-4c40-b42e-aa96bba3cca7"
+      - appfilename="app-debug.apk"
+      - testfilename="app-debug-androidTest.apk"
+      - devicePoolArn="arn:aws:devicefarm:us-west-2:272510231547:devicepool:34b18a67-8bad-4c40-b42e-aa96bba3cca7/b00b0350-a024-477c-9c82-0f6d6242a977"
 
   build:
     commands:
       - ls -la *
       - chmod +x ./gradlew
       - ./gradlew clean
-      #- ./gradlew assembleAndroidTest
       - ./gradlew assembleDebug
+      -
       - ls -la ./app/build/outputs/apk/debug/
+      - ./gradlew assembleAndroidTest
+      - ls -la ./app/build/outputs/apk/androidTest/debug/
+      - pkgfile=`find . -name ${appfilename}`
+      - testfile=`find . -name ${testfilename}`
+      - pkgOutput=$(aws devicefarm create-upload --project-arn ${projectArn} --name ${appfilename} --type ANDROID_APP)
+      - pkgUploadArn=`echo ${pkgOutput}|jq -r ."upload.arn"`
+      - pkgUploadUrl=`echo ${pkgOutput}|jq -r ."upload.url"`
+      - testOutput=$(aws devicefarm create-upload --project-arn ${projectArn} --name ${testfilename} --type INSTRUMENTATION_TEST_PACKAGE)
+      - testUploadArn=`echo ${testOutput}|jq -r ."upload.arn"`
+      - testUploadUrl=`echo ${testOutput}|jq -r ."upload.url"`
+      - curl -T ${pkgfile} ${pkgUploadUrl}
+      - curl -T ${testfile} ${testUploadUrl}
+      - aws devicefarm schedule-run --project-arn ${prjectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn}
+
 artifacts:
   files:
     - './app/build/outputs/**/*.apk'

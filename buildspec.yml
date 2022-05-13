@@ -9,7 +9,7 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR..."
       - AWS_DEFAULT_REGION=us-west-2
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - #$(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - apt-get install -y jq
       - projectArn="arn:aws:devicefarm:us-west-2:272510231547:project:34b18a67-8bad-4c40-b42e-aa96bba3cca7"
       - appfilename="app-debug.apk"

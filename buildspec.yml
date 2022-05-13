@@ -5,17 +5,16 @@ phases:
     runtime-versions:
       java: corretto11
       #python: 3.8
-      aws_cli: 2.0
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
       - AWS_DEFAULT_REGION=us-west-2
       - #$(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - apt-get install -y jq
-      - projectArn="arn:aws:devicefarm:us-west-2:272510231547:project:34b18a67-8bad-4c40-b42e-aa96bba3cca7"
       - appfilename="app-debug.apk"
       - testfilename="app-debug-androidTest.apk"
       - devicePoolArn="arn:aws:devicefarm:us-west-2:272510231547:devicepool:34b18a67-8bad-4c40-b42e-aa96bba3cca7/b00b0350-a024-477c-9c82-0f6d6242a977"
+      - projectArn='arn:aws:devicefarm:us-west-2:272510231547:project:34b18a67-8bad-4c40-b42e-aa96bba3cca7'
 
   build:
     commands:
@@ -39,7 +38,7 @@ phases:
       - testUploadUrl=`echo ${testOutput}|jq -r ."upload.url"`
       - curl -T ${pkgfile} ${pkgUploadUrl}
       - curl -T ${testfile} ${testUploadUrl}
-      - result=$(aws devicefarm schedule-run --project-arn ${projectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn})
+      - result=`aws devicefarm schedule-run --project-arn ${projectArn} --app-arn ${pkgUploadArn} --device-pool-arn ${devicePoolArn} --name MyAndroidTest --test type=INSTRUMENTATION,testPackageArn=${testUploadArn}`
       - echo $result
 
 artifacts:

@@ -68,7 +68,7 @@ while true ;do
     if [ "result"x = "PASSED"x ]; then
       exit 0
     else
-      echo "####test cases not passed, please check the test results"
+      echo "####test cases not passed, please check the detail in device farm"
       exit 255
     fi
   fi

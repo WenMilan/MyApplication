@@ -32,7 +32,7 @@ uploadArns=(
 
 for uploadArn in "${uploadArns[@]}"; do
   i=0
-  status=FAILED
+  status=PENDING
   echo "######Start $uploadArn"
   while true ;do
     sleep 1
@@ -45,11 +45,38 @@ for uploadArn in "${uploadArns[@]}"; do
     fi
 
     i=`expr $i + 1`
-    if [ $i -gt 10 ]; then
+    #20 seconds timeout
+    if [ $i -gt 20 ]; then
       echo "###upload task time out"
       exit 255
     fi
   done
 done
 
-aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"
+runArn=$(aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}")|jq -r ."run.arn"
+echo runArn=$runArn
+i=0
+status=PENDING
+result=FAILED
+while true ;do
+  sleep 60
+  status=$(aws devicefarm get-run --arn "${runArn}"|jq -r ."run.status")
+  echo "#loop "$i
+  echo $status
+  if [ "$status"x = "COMPLETED"x ]; then
+    result=$(aws devicefarm get-run --arn "${runArn}"|jq -r ."run.result")
+    if [ "result"x = "PASSED"x ]; then
+      exit 0
+    else
+      exit 255
+    fi
+  fi
+
+  i=`expr $i + 1`
+  #120 minutes timeout
+  if [ $i -gt 120 ]; then
+    echo "###execute run task time out"
+    exit 255
+  fi
+done
+

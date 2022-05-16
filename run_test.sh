@@ -38,7 +38,7 @@ for uploadArn in "${uploadArns[@]}"; do
     sleep 1
     status=$(aws devicefarm get-upload --arn "${uploadArn}"|jq -r ."upload.status")
     echo "#loop "$i
-    echo $status
+    echo status=$status
     if [ "$status"x = "SUCCEEDED"x ]; then
       echo "######status success"
       break
@@ -62,10 +62,10 @@ while true ;do
   sleep 60
   status=$(aws devicefarm get-run --arn "${runArn}"|jq -r ."run.status")
   echo "#loop "$i
-  echo $status
+  echo status=$status
   if [ "$status"x = "COMPLETED"x ]; then
     result=$(aws devicefarm get-run --arn "${runArn}"|jq -r ."run.result")
-    if [ "result"x = "PASSED"x ]; then
+    if [ "$result"x = "PASSED"x ]; then
       exit 0
     else
       echo "####test cases not passed, please check the detail in device farm"

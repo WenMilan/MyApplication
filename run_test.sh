@@ -53,7 +53,7 @@ for uploadArn in "${uploadArns[@]}"; do
   done
 done
 
-runArn=$(aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}")|jq -r ."run.arn"
+runArn=$(aws devicefarm schedule-run --project-arn "${projectArn}" --app-arn "${pkgUploadArn}" --device-pool-arn "${devicePoolArn}" --name "${runname}" --test type=INSTRUMENTATION,testPackageArn="${testUploadArn}"|jq -r ."run.arn")
 echo runArn=$runArn
 i=0
 status=PENDING
